@@ -12,6 +12,10 @@ public class Btree<K,V> {
         this.order = order;
     }
 
+    public int size() {
+        return this.size;
+    }
+
     public boolean put(K key, V value) {
         if (get(key) != null) {
             return false;
@@ -64,7 +68,7 @@ public class Btree<K,V> {
         BtreeNode<K, V> v = root;
         hot = null;
         while (v != null) {
-            int rank = searchKey(v, new Entry<K, V>(key));
+            int rank = searchKey(v, new Entry<>(key));
             Vector<Entry<K,V>> keys = v.getEntrys();
             if (rank >= 0 && keys.get(rank).getKey() == key) {
                 return keys.get(rank).getValue();
@@ -80,7 +84,7 @@ public class Btree<K,V> {
         BtreeNode<K, V> v = root;
         hot = null;
         while (v != null) {
-            int rank = searchKey(v, new Entry<K, V>(key));
+            int rank = searchKey(v, new Entry<>(key));
             Vector<Entry<K,V>> keys = v.getEntrys();
             if (rank >= 0 && keys.get(rank).getKey() == key) {
                 return v;
@@ -97,7 +101,7 @@ public class Btree<K,V> {
         if (node == null) {
             return null;
         }
-        int rank = searchKey(node, new Entry<K, V>(key));
+        int rank = searchKey(node, new Entry<>(key));
         V value = node.getEntrys().get(rank).getValue();
         //非叶子节点
         if (node.getChilds().get(0) != null) {
@@ -128,14 +132,19 @@ public class Btree<K,V> {
         }
         BtreeNode<K,V> p = node.getParent();
         if (p == null) {
+            if (node.getEntrys().size() == 0 && node.getChilds().get(0) != null) {
+                root = node.getChilds().get(0);
+                root.setParent(null);
+                //释放node
+            }
             return;
         }
         int rank = 0;
-        for (BtreeNode<K, V> child : p.getChilds()) {
-            if (node == child) {
+        for (int i = 0; i < p.getChilds().size(); i++) {
+            if (node == p.getChilds().get(i)) {
+                rank = i;
                 break;
             }
-            rank++;
         }
         //左顾右盼-左顾
         if (0 < rank) {
@@ -215,6 +224,7 @@ public class Btree<K,V> {
             }
             //释放node
         }
+        solveUnderflow(p);
     }
 
     private int searchKey(BtreeNode<K, V> v, Entry<K, V> entry) {
