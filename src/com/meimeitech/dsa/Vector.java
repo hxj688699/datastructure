@@ -115,7 +115,7 @@ public class Vector<E> {
             if (cmp < 0) {
                 hi = mi;
             } else {
-                lo = mi;
+                lo = mi + 1;
             }
         }
         return --lo;

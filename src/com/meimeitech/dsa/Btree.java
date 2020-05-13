@@ -8,8 +8,16 @@ public class Btree<K,V> {
     private BtreeNode<K,V> root;
     private BtreeNode<K,V> hot;
 
+    public Btree(){
+        this(3);
+    }
     public Btree(int order) {
+        //默认最低三阶
+        if (order < 3) {
+            this.order = 3;
+        }
         this.order = order;
+        this.root = new BtreeNode<>();
     }
 
     public int size() {
