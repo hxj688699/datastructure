@@ -31,7 +31,13 @@ public class Vector<E> {
         return true;
     }
 
-    public void add(int index, E e) {
+    public void putAt(int index, E e) {
+        rangeCheckForAdd(index);
+        this.elementData[index] = e;
+    }
+
+    public void insert(int index, E e) {
+        rangeCheckForAdd(index);
         ensureCapacity(size + 1);
         System.arraycopy(elementData, index, elementData, index + 1, size - index);
         this.elementData[index] = e;
@@ -49,11 +55,10 @@ public class Vector<E> {
         return (E) elementData[index];
     }
 
-    public E[] subVector(int from, int to) {
+    public E[] subVector(E[] a, int from, int to) {
         int subSize = to - from;
-        Object[] es = new Object[subSize];
-        System.arraycopy(elementData, from, es, 0, subSize);
-        return (E[]) es;
+        System.arraycopy(elementData, from, a, 0, subSize);
+        return a;
     }
 
     private void ensureCapacity(int minCapacity) {
@@ -91,6 +96,12 @@ public class Vector<E> {
         }
     }
 
+    private void rangeCheckForAdd(int index) {
+        if (index > size || index < 0) {
+            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+    }
+
     public boolean batchRemove(int from, int to) {
         rangeCheck(from);
         rangeCheck(to - 1);
@@ -108,7 +119,7 @@ public class Vector<E> {
 
     public int search(E e, Comparator<? super E> c) {
         int lo = 0;
-        int hi = size - 1;
+        int hi = size;
         while (lo < hi) {
             int mi = (lo + hi) >> 1;
             int cmp = c != null ? c.compare(e, (E) elementData[mi]) : ((Comparable) e).compareTo(elementData[mi]);
@@ -133,7 +144,7 @@ public class Vector<E> {
         }
         v1.addAll(src);
         Vector<Integer> v2 = new Vector<>();
-        v2.addAll(v1.subVector(from, to));
+        v2.addAll(v1.subVector(new Integer[from - to], from, to));
         v1.batchRemove(src.length / 2, 5);
         System.out.println();
     }
